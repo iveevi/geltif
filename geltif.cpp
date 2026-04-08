@@ -18,7 +18,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <howler.hpp>
+#include <cstdio>
 #include "geltif.hpp"
 
 static std::string load_texture(const cgltf_texture_view &view, const std::filesystem::path &directory, Scene &scene)
@@ -46,7 +46,7 @@ static std::string load_texture(const cgltf_texture_view &view, const std::files
 	}
 
 	if (!pixels) {
-		howl_error("failed to decode texture {}: {}", key, stbi_failure_reason());
+		fprintf(stderr, "geltif: failed to decode texture %s: %s\n", key.c_str(), stbi_failure_reason());
 		return {};
 	}
 
@@ -56,7 +56,7 @@ static std::string load_texture(const cgltf_texture_view &view, const std::files
 	img.pixels.assign(pixels, pixels + w * h * 4);
 	stbi_image_free(pixels);
 
-	howl_info("loaded texture: {} ({}x{})", key, w, h);
+	fprintf(stderr, "geltif: loaded texture: %s (%dx%d)\n", key.c_str(), w, h);
 	scene.textures.emplace(key, std::move(img));
 	return key;
 }

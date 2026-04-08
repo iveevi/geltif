@@ -5,7 +5,6 @@ endif()
 add_library(geltif STATIC EXCLUDE_FROM_ALL geltif.cpp)
 target_include_directories(geltif PUBLIC
 	${CMAKE_CURRENT_LIST_DIR}
-	${CMAKE_CURRENT_LIST_DIR}/ext/howler
 	${GELTIF_GLM_PATH}
 )
 target_include_directories(geltif PRIVATE
