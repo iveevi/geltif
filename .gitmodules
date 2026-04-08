@@ -1,0 +1,9 @@
+[submodule "ext/cgltf"]
+	path = ext/cgltf
+	url = https://github.com/jkuhlmann/cgltf.git
+[submodule "ext/stb"]
+	path = ext/stb
+	url = https://github.com/nothings/stb.git
+[submodule "ext/howler"]
+	path = ext/howler
+	url = https://github.com/iveevi/howler.git
