@@ -8,8 +8,6 @@
 #include <cfloat>
 #include <cmath>
 #include <cstring>
-#include <functional>
-#include <stdexcept>
 #include <tuple>
 #include <unordered_map>
 
@@ -18,7 +16,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <cstdio>
 #include "geltif.hpp"
 
 static std::string load_texture(const cgltf_texture_view &view, const std::filesystem::path &directory, Scene &scene)
@@ -45,18 +42,14 @@ static std::string load_texture(const cgltf_texture_view &view, const std::files
 		pixels = stbi_load_from_memory(raw, static_cast <int> (image->buffer_view->size), &w, &h, &channels, 4);
 	}
 
-	if (!pixels) {
-		fprintf(stderr, "geltif: failed to decode texture %s: %s\n", key.c_str(), stbi_failure_reason());
+	if (!pixels)
 		return {};
-	}
 
 	RawTexture img;
 	img.width = static_cast <uint32_t> (w);
 	img.height = static_cast <uint32_t> (h);
 	img.pixels.assign(pixels, pixels + w * h * 4);
 	stbi_image_free(pixels);
-
-	fprintf(stderr, "geltif: loaded texture: %s (%dx%d)\n", key.c_str(), w, h);
 	scene.textures.emplace(key, std::move(img));
 	return key;
 }
@@ -200,25 +193,25 @@ void Camera::update(float dt)
 	transform = parent_transform * animation->evaluate();
 }
 
-Scene Scene::from_file(const std::filesystem::path &path)
+std::expected <Scene, std::string> Scene::from_file(const std::filesystem::path &path)
 {
 	cgltf_options options {};
 	cgltf_data *data = nullptr;
 
 	cgltf_result result = cgltf_parse_file(&options, path.c_str(), &data);
 	if (result != cgltf_result_success)
-		throw std::runtime_error("failed to parse glTF: " + path.string());
+		return std::unexpected("failed to parse glTF: " + path.string());
 
 	result = cgltf_load_buffers(&options, data, path.c_str());
 	if (result != cgltf_result_success) {
 		cgltf_free(data);
-		throw std::runtime_error("failed to load glTF buffers: " + path.string());
+		return std::unexpected("failed to load glTF buffers: " + path.string());
 	}
 
 	result = cgltf_validate(data);
 	if (result != cgltf_result_success) {
 		cgltf_free(data);
-		throw std::runtime_error("glTF validation failed: " + path.string());
+		return std::unexpected("glTF validation failed: " + path.string());
 	}
 
 	Scene scene;

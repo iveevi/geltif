@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
 #include <optional>
 #include <string>
 #include <utility>
@@ -141,5 +142,5 @@ struct Scene {
 	// TODO: probably wont need this method either
 	std::pair <glm::vec3, glm::vec3> bounds() const;
 
-	static Scene from_file(const std::filesystem::path &path);
+	static std::expected <Scene, std::string> from_file(const std::filesystem::path &path);
 };
