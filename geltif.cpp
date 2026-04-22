@@ -328,9 +328,12 @@ std::expected <Scene, std::string> Scene::from_file(const std::filesystem::path 
 				});
 				break;
 			case cgltf_light_type_point:
+				// glTF exports punctual light intensity in candela (lm/sr);
+				// convert back to W to match Blender's displayed value:
+				// W = candela * 4π / 683
 				scene.lights.push_back(PointLight {
 					.color = color,
-					.intensity = cl.intensity,
+					.intensity = cl.intensity * 4.0f * glm::pi <float> () / 683.0f,
 					.position = position,
 					.range = cl.range,
 				});
@@ -338,7 +341,7 @@ std::expected <Scene, std::string> Scene::from_file(const std::filesystem::path 
 			case cgltf_light_type_spot:
 				scene.lights.push_back(SpotLight {
 					.color = color,
-					.intensity = cl.intensity,
+					.intensity = cl.intensity * 4.0f * glm::pi <float> () / 683.0f,
 					.position = position,
 					.direction = direction,
 					.range = cl.range,
